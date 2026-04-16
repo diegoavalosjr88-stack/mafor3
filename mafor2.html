@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mafor Stylist 💅 - Agenda tu cita</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8e1e9 0%, #f0c4d9 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 248, 250, 0.95);
+            border-radius: 40px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 35px rgba(204, 0, 102, 0.2);
+            backdrop-filter: blur(2px);
+            transition: transform 0.2s ease;
+        }
+
+        .header {
+            text-align: center;
+            color: #b8005c;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #d44c8a;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            background: linear-gradient(135deg, #ffd9e8, #ffc2db);
+            color: #99004d;
+            border: none;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(204, 0, 102, 0.25);
+            background: linear-gradient(135deg, #ffc2db, #ffa8cc);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ffb3b3, #ff8080);
+            color: #5e0000;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #ff8080, #ff5e5e);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px;
+            padding: 25px 20px;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 35px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            color: #cc0066;
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-size: 1.7rem;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 10px 0;
+            border: 2px solid #ffb3d9;
+            border-radius: 60px;
+            font-size: 15px;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: #cc0066;
+            box-shadow: 0 0 0 3px rgba(204,0,102,0.1);
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-confirmar {
+            background: #cc0066;
+            color: white;
+            margin-top: 15px;
+        }
+        
+        .btn-confirmar:hover {
+            background: #a10052;
+            transform: scale(0.98);
+        }
+
+        .btn-cancelar {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .btn-cancelar:hover {
+            background: #e0e0e0;
+        }
+
+        .horario-item {
+            background: #ffe6f2;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 60px;
+            text-align: center;
+            transition: 0.2s;
+            border-left: 5px solid #2ecc71;
+            font-weight: 500;
+        }
+
+        .horario-ocupado {
+            background: #ffe0e0;
+            border-left-color: #e74c3c;
+            color: #a00000;
+        }
+
+        .precio-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ffcce6;
+            font-size: 16px;
+        }
+
+        .precio-nombre {
+            font-weight: bold;
+            color: #cc0066;
+        }
+
+        .precio-valor {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .success-message {
+            color: #27ae60;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+            background: #e8f8f5;
+            padding: 8px;
+            border-radius: 50px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+            background: #fdecea;
+            padding: 8px;
+            border-radius: 50px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #cc6699;
+        }
+        
+        .info-horario {
+            text-align: center;
+            font-size: 12px;
+            background: #fff0f5;
+            padding: 8px;
+            border-radius: 50px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            .header h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💅 Mafor Stylist 💅</h1>
+            <p>✨ Tu belleza, mi pasión ✨</p>
+        </div>
+
+        <button class="btn" onclick="abrirAgendar()">📅 Agendar cita</button>
+        <button class="btn" onclick="verHorarios()">📋 Ver horarios disponibles</button>
+        <button class="btn" onclick="verPrecios()">💰 Ver lista de precios</button>
+        <button class="btn" onclick="abrirMapa()">📍 Ubicación (Google Maps)</button>
+        <button class="btn btn-danger" onclick="cerrarApp()">❌ Salir</button>
+        <footer>💖 Agendas 100% seguras • Horario Lun-Sáb 9am a 7pm</footer>
+    </div>
+
+    <!-- Modal Precios -->
+    <div id="modalPrecios" class="modal">
+        <div class="modal-content">
+            <h2>✨ Lista de Precios ✨</h2>
+            <div class="precio-item"><span class="precio-nombre">💅 Uñas Acrílicas</span><span class="precio-valor">$350 MXN</span></div>
+            <div class="precio-item"><span class="precio-nombre">✨ Gel Semipermanente</span><span class="precio-valor">$150 MXN</span></div>
+            <div class="precio-item"><span class="precio-nombre">💎 Gel Rubber</span><span class="precio-valor">$250 MXN</span></div>
+            <div class="precio-item"><span class="precio-nombre">🌸 Manicura Completa</span><span class="precio-valor">$250 MXN</span></div>
+            <div class="precio-item"><span class="precio-nombre">✨ Uñas Esculpidas</span><span class="precio-valor">$400 MXN</span></div>
+            <button class="btn-cancelar" onclick="cerrarModal('modalPrecios')" style="margin-top: 20px;">⬅ Regresar</button>
+        </div>
+    </div>
+
+    <!-- Modal Agendar -->
+    <div id="modalAgendar" class="modal">
+        <div class="modal-content">
+            <h2>📅 Nueva Cita</h2>
+            <input type="text" id="nombreCliente" placeholder="Tu nombre completo *" autocomplete="off">
+            <input type="tel" id="telefonoCliente" placeholder="Tu teléfono (10 dígitos) *" autocomplete="off">
+            <select id="servicioCliente">
+                <option value="">Selecciona un servicio *</option>
+                <option value="Uñas Acrílicas">💅 Uñas Acrílicas - $350</option>
+                <option value="Gel Semipermanente">✨ Gel Semipermanente - $150</option>
+                <option value="Gel Rubber">💎 Gel Rubber - $250</option>
+                <option value="Manicura Completa">🌸 Manicura Completa - $250</option>
+            </select>
+            <select id="horarioCliente">
+                <option value="">Cargando horarios...</option>
+            </select>
+            <button class="btn-confirmar" onclick="guardarCita()">✅ Confirmar cita</button>
+            <button class="btn-cancelar" onclick="cerrarModal('modalAgendar')">❌ Cancelar</button>
+            <div id="mensajeAgendar"></div>
+        </div>
+    </div>
+
+    <!-- Modal Horarios -->
+    <div id="modalHorarios" class="modal">
+        <div class="modal-content">
+            <h2>📋 Horarios de Hoy</h2>
+            <div id="listaHorarios"></div>
+            <button class="btn-cancelar" onclick="cerrarModal('modalHorarios')">⬅ Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURACIÓN INICIAL ====================
+        let citas = JSON.parse(localStorage.getItem('citasMafor')) || [];
+
+        // Horarios laborales de lunes a sábado (9am a 7pm)
+        const horariosDisponibles = [
+            "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+            "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM",
+            "05:00 PM", "06:00 PM", "07:00 PM"
+        ];
+
+        // Obtener fecha actual en formato YYYY-MM-DD
+        function getFechaActual() {
+            const hoy = new Date();
+            const año = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            return `${año}-${mes}-${dia}`;
+        }
+
+        // Obtener horarios libres para una fecha específica
+        function obtenerHorariosLibres(fecha) {
+            const citasOcupadas = citas.filter(cita => cita.fecha === fecha).map(cita => cita.horario);
+            return horariosDisponibles.filter(horario => !citasOcupadas.includes(horario));
+        }
+
+        // Guardar citas en localStorage
+        function guardarCitasStorage() {
+            localStorage.setItem('citasMafor', JSON.stringify(citas));
+        }
+
+        // ==================== FUNCIONES DEL MENÚ PRINCIPAL ====================
+        function abrirAgendar() {
+            const modal = document.getElementById('modalAgendar');
+            const horarioSelect = document.getElementById('horarioCliente');
+            
+            // Limpiar campos
+            document.getElementById('nombreCliente').value = '';
+            document.getElementById('telefonoCliente').value = '';
+            document.getElementById('servicioCliente').value = '';
+            document.getElementById('mensajeAgendar').innerHTML = '';
+            
+            const fechaHoy = getFechaActual();
+            const horariosLibres = obtenerHorariosLibres(fechaHoy);
+            
+            horarioSelect.innerHTML = '<option value="">⏰ Selecciona un horario</option>';
+            
+            if (horariosLibres.length === 0) {
+                horarioSelect.innerHTML = '<option value="" disabled>🚫 No hay horarios disponibles para hoy</option>';
+                // Agregar mensaje adicional
+                const msgDiv = document.getElementById('mensajeAgendar');
+                msgDiv.innerHTML = '<p class="error-message">⚠️ Hoy no hay horarios libres. ¡Intenta mañana!</p>';
+            } else {
+                horariosLibres.forEach(horario => {
+                    const option = document.createElement('option');
+                    option.value = horario;
+                    option.textContent = `🕒 ${horario} (Disponible)`;
+                    horarioSelect.appendChild(option);
+                });
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function guardarCita() {
+            const nombre = document.getElementById('nombreCliente').value.trim();
+            const telefono = document.getElementById('telefonoCliente').value.trim();
+            const servicio = document.getElementById('servicioCliente').value;
+            const horario = document.getElementById('horarioCliente').value;
+            const mensajeDiv = document.getElementById('mensajeAgendar');
+            
+            // Validaciones mejoradas
+            if (!nombre || !telefono || !servicio || !horario) {
+                mensajeDiv.innerHTML = '<p class="error-message">❌ Por favor completa todos los campos.</p>';
+                return;
+            }
+            
+            if (telefono.length < 8 || !/^\d+$/.test(telefono)) {
+                mensajeDiv.innerHTML = '<p class="error-message">📱 Ingresa un número de teléfono válido (solo números, mínimo 8 dígitos).</p>';
+                return;
+            }
+            
+            const fecha = getFechaActual();
+            
+            // Verificar si ya existe una cita en ese horario
+            const yaExiste = citas.some(cita => cita.fecha === fecha && cita.horario === horario);
+            if (yaExiste) {
+                mensajeDiv.innerHTML = '<p class="error-message">⚠️ Este horario ya fue ocupado. Por favor selecciona otro.</p>';
+                // Recargar horarios disponibles
+                const horariosLibres = obtenerHorariosLibres(fecha);
+                const horarioSelect = document.getElementById('horarioCliente');
+                horarioSelect.innerHTML = '<option value="">⏰ Selecciona un horario</option>';
+                horariosLibres.forEach(h => {
+                    const option = document.createElement('option');
+                    option.value = h;
+                    option.textContent = `🕒 ${h} (Disponible)`;
+                    horarioSelect.appendChild(option);
+                });
+                return;
+            }
+            
+            // Crear nueva cita
+            const nuevaCita = {
+                id: Date.now(),
+                nombre: nombre,
+                telefono: telefono,
+                servicio: servicio,
+                fecha: fecha,
+                horario: horario,
+                fechaRegistro: new Date().toISOString()
+            };
+            
+            citas.push(nuevaCita);
+            guardarCitasStorage();
+            
+            mensajeDiv.innerHTML = '<p class="success-message">✅ ¡Cita agendada con éxito! Redirigiendo...</p>';
+            
+            // Mostrar resumen y cerrar modal después de 1.5 segundos
+            setTimeout(() => {
+                cerrarModal('modalAgendar');
+                alert(`✨ ¡Cita confirmada, ${nombre}! ✨\n\n💅 Servicio: ${servicio}\n📅 Fecha: Hoy (${fecha})\n⏰ Horario: ${horario}\n\n📍 Dirección: 25 Norte 7204, La Lima, Puebla\n📞 ¡Te esperamos puntual! 💕`);
+            }, 1500);
+        }
+
+        function verHorarios() {
+            const modal = document.getElementById('modalHorarios');
+            const listaHorarios = document.getElementById('listaHorarios');
+            const fechaHoy = getFechaActual();
+            const horariosLibres = obtenerHorariosLibres(fechaHoy);
+            const citasHoy = citas.filter(cita => cita.fecha === fechaHoy);
+            
+            let html = `<p style="text-align:center; font-weight:bold; background:#ffe0f0; padding:8px; border-radius:60px;">📅 ${fechaHoy}</p>`;
+            
+            // Mostrar horarios libres
+            html += `<div style="margin: 15px 0;"><strong>✅ Horarios disponibles (${horariosLibres.length}):</strong></div>`;
+            if (horariosLibres.length > 0) {
+                horariosLibres.forEach(horario => {
+                    html += `<div class="horario-item">🟢 ${horario} - Libre</div>`;
+                });
+            } else {
+                html += `<div class="horario-item" style="background:#ffe0e0; border-left-color:#e74c3c;">❌ No hay horarios libres hoy</div>`;
+            }
+            
+            // Mostrar citas ocupadas
+            if (citasHoy.length > 0) {
+                html += `<div style="margin: 20px 0 10px 0;"><strong>📋 Citas agendadas hoy (${citasHoy.length}):</strong></div>`;
+                citasHoy.forEach(cita => {
+                    html += `<div class="horario-item horario-ocupado">🔴 ${cita.horario} - ${cita.nombre} (${cita.servicio})</div>`;
+                });
+            } else {
+                html += `<div style="margin-top: 15px;"><div class="horario-item" style="background:#e0ffe0; border-left-color:#2ecc71;">✨ No hay citas aún, ¡el día está libre!</div></div>`;
+            }
+            
+            html += `<div class="info-horario">🕘 Horario laboral: 9:00 AM a 7:00 PM (Lun-Sáb)</div>`;
+            listaHorarios.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+
+        function verPrecios() {
+            document.getElementById('modalPrecios').style.display = 'flex';
+        }
+
+        function abrirMapa() {
+            window.open("https://www.google.com/maps/search/?api=1&query=25+norte+7204+La+Loma+Puebla", "_blank");
+        }
+
+        function cerrarApp() {
+            const confirmar = confirm('¿Cerrar la aplicación? Tus citas están guardadas.');
+            if (confirmar) {
+                // Intentar cerrar la ventana (funciona en ventanas abiertas por script)
+                window.close();
+                // Mensaje alternativo por si no se puede cerrar
+                setTimeout(() => {
+                    alert("No se pudo cerrar automáticamente. Puedes cerrar esta pestaña manualmente. ¡Gracias por confiar en Mafor Stylist! 💅");
+                }, 100);
+            }
+        }
+
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = 'none';
+            // Limpiar mensajes de error al cerrar
+            if (id === 'modalAgendar') {
+                document.getElementById('mensajeAgendar').innerHTML = '';
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    if (modal.id === 'modalAgendar') {
+                        document.getElementById('mensajeAgendar').innerHTML = '';
+                    }
+                }
+            }
+        }
+
+        // Inicialización: Limpiar citas antiguas (opcional, mantener solo las del día actual si se desea)
+        // Pero mejor mantener histórico para mostrar registro, aunque solo se vean las de hoy en "Ver horarios"
+        
+        // Mostrar en consola el estado actual
+        console.log(`💅 Mafor Stylist funcionando correctamente | ${citas.length} citas registradas en total`);
+        
+        // Pequeña limpieza: eliminar citas de fechas pasadas si quieres mantener solo futuras, pero por simplicidad se mantienen todas
+        // para que el cliente pueda ver historial en localStorage.
+    </script>
+</body>
+</html>
